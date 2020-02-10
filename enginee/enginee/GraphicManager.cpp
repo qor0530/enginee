@@ -2,6 +2,7 @@
 #include "GameManager.h"
 #include "Scene.h"
 #include "Animation.h"
+#include "Camera.h"
 LPDIRECT3DDEVICE9 GraphicManager::device = nullptr;
 //LPDIRECT3DTEXTURE9 GraphicManager::testTexture = nullptr;
 LPD3DXSPRITE GraphicManager::sprite = nullptr;
@@ -33,8 +34,11 @@ void GraphicManager::Init(LPDIRECT3DDEVICE9 device)
 	D3DXCreateSprite(device, &sprite);
 
 	//testTexture = CreateTexture(L"TextImage.png");
-	AddTexture("TestImage", L"TextImage.png");
-	AddTexture("TestAnimation", L"TestTexture.png");
+	AddTexture("TestImage", L"./Resource/TextImage.png");
+	AddTexture("TestAnimation", L"./Resource/st.png");
+	AddTexture("BackGround", L"./Resource/Back.png");
+	AddTexture("Bullet", L"./Resource/Bullet.png");
+	AddTexture("Enemy", L"./Resource/enemy.png");
 }
 
 LPDIRECT3DTEXTURE9 GraphicManager::GetTexture(std::string textureName)
@@ -50,6 +54,17 @@ LPDIRECT3DTEXTURE9 GraphicManager::GetTexture(std::string textureName)
 void GraphicManager::Render()
 {
 	auto objList = GameManager::nowScene->GetObjectList();
+
+	objList.sort(compare);
+	objList.sort([](GameObject *o1, GameObject *o2)
+	{
+		if (o1->sortingLayer < o2->sortingLayer)
+		{
+			return true;
+		}
+			return false;
+	});
+
 	for (auto obj : objList)
 	{
 		Render(obj);
@@ -59,10 +74,18 @@ void GraphicManager::Render()
 void GraphicManager::Render(GameObject * object)
 {
 	auto tex = GetTexture(object->animation->textureName);
-	D3DXMATRIX matrix, positionMatrix;
-	D3DXMatrixTranslation(&positionMatrix, 0.0f, 0.0f, 0.0f);
+	auto frameSize = object->animation->frameSize;
+	D3DXMATRIX matrix, positionMatrix, centerMatrix, rotateMatrix, scaleMatrix;
+	D3DXMatrixTranslation(&positionMatrix, object->position.x, object->position.y, 0.0f);
+	D3DXMatrixTranslation(&centerMatrix, -frameSize.x *0.5f, -frameSize.y* 0.5f, 0.0f);
+	
+	D3DXMatrixRotationZ(&rotateMatrix, D3DXToRadian(object->degree));
 
-	matrix = positionMatrix;
+	D3DXMatrixScaling(&scaleMatrix, object->scale.x, object->scale.y, 0.0f);
+
+	matrix = centerMatrix*scaleMatrix*rotateMatrix*positionMatrix;
+
+	matrix *= Camera::matrix;
 
 	RECT rc = object->animation->GetRect();
 
@@ -109,4 +132,11 @@ D3DXVECTOR2 GraphicManager::GetTextureSize(std::string textureName)
 {
 	auto tex = GetTexture(textureName);
 	return GetTextureSize(tex);
+}
+
+bool GraphicManager::compare(GameObject * o1, GameObject * o2)
+{
+	if (o1->sortingLayer < o2->sortingLayer)
+		return true;
+	return false;
 }

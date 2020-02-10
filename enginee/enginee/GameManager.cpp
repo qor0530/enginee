@@ -3,6 +3,10 @@
 #include "Scene.h"
 #include "GraphicManager.h"
 #include "TextObject.h"
+#include "BackGround.h"
+#include "InputManager.h"
+#include "Enemy.h"
+
 LPDIRECT3D9 GameManager::g_pD3D = LPDIRECT3D9();
 LPDIRECT3DDEVICE9 GameManager::g_pd3dDevice = LPDIRECT3DDEVICE9();
 Scene * GameManager::nowScene = nullptr;
@@ -23,15 +27,21 @@ void GameManager::Init(HWND hWnd)
 		&d3dpp, &g_pd3dDevice);
 
 	GraphicManager::Init(g_pd3dDevice);
-
+	InputManager::Init(hWnd);
 	nowScene = new Scene();
-
+	Instantiate<Enemy>({ 500.0f, 0.0f });
+	Instantiate<Enemy>({ -500.0f, 0.0f });
+	Instantiate<Enemy>({ 0.0f, 500.0f });
+	Instantiate<Enemy>({ 0.0f, -500.0f });
 	Instantiate<TextObject>({ 0.0f, 0.0f });
+	Instantiate<BackGround>({ 0.0f, 0.0f });
 }
 
 void GameManager::Update()
 {
+	InputManager::Update();
 	nowScene->Update();
+	Camera::Update();
 }
 
 void GameManager::Render()

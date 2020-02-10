@@ -22,6 +22,8 @@ public:
 	D3DXVECTOR2 scale;
 	float degree;
 
+	int sortingLayer;
+
 	bool isActive;
 
 	virtual void Awake();
