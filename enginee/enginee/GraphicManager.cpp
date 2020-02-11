@@ -7,6 +7,7 @@ LPDIRECT3DDEVICE9 GraphicManager::device = nullptr;
 //LPDIRECT3DTEXTURE9 GraphicManager::testTexture = nullptr;
 LPD3DXSPRITE GraphicManager::sprite = nullptr;
 std::map<std::string, LPDIRECT3DTEXTURE9> GraphicManager::textureMap = std::map<std::string, LPDIRECT3DTEXTURE9>();
+ID3DXFont * GraphicManager::font;
 GraphicManager::GraphicManager()
 {
 }
@@ -32,13 +33,27 @@ void GraphicManager::Init(LPDIRECT3DDEVICE9 device)
 	GraphicManager::device = device;
 
 	D3DXCreateSprite(device, &sprite);
+	D3DXCreateFont(device,
+		30,
+		0,
+		FW_EXTRABOLD,
+		1,
+		false,
+		DEFAULT_CHARSET,
+		OUT_DEFAULT_PRECIS,
+		DEFAULT_QUALITY,
+		DEFAULT_PITCH | FF_DONTCARE,
+		L"±¼¸²Ã¼",
+		&font
+	);
+
 
 	//testTexture = CreateTexture(L"TextImage.png");
-	AddTexture("TestImage", L"./Resource/TextImage.png");
-	AddTexture("TestAnimation", L"./Resource/st.png");
-	AddTexture("BackGround", L"./Resource/Back.png");
-	AddTexture("Bullet", L"./Resource/Bullet.png");
-	AddTexture("Enemy", L"./Resource/enemy.png");
+	AddTexture("TestImage", L"./Resource/Image/TextImage.png");
+	AddTexture("TestAnimation", L"./Resource/Image/st.png");
+	AddTexture("BackGround", L"./Resource/Image/Back.png");
+	AddTexture("Bullet", L"./Resource/Image/Bullet.png");
+	AddTexture("Enemy", L"./Resource/Image/enemy.png");
 }
 
 LPDIRECT3DTEXTURE9 GraphicManager::GetTexture(std::string textureName)
@@ -69,6 +84,8 @@ void GraphicManager::Render()
 	{
 		Render(obj);
 	}
+
+
 }
 
 void GraphicManager::Render(GameObject * object)
@@ -94,6 +111,8 @@ void GraphicManager::Render(GameObject * object)
 	sprite->Begin(D3DXSPRITE_ALPHABLEND);
 	sprite->Draw(tex, &rc, NULL, NULL, D3DCOLOR_ARGB(255, 255, 255, 255));
 	sprite->End();
+
+	object->OnRender();
 }
 
 LPDIRECT3DTEXTURE9 GraphicManager::CreateTexture(LPCWSTR fileName)
@@ -139,4 +158,15 @@ bool GraphicManager::compare(GameObject * o1, GameObject * o2)
 	if (o1->sortingLayer < o2->sortingLayer)
 		return true;
 	return false;
+}
+
+void GraphicManager::RenderText(std::string str, D3DXVECTOR2 position)
+{
+	RECT rc;
+	rc.left = position.x + Camera::ScreenWidth *0.5f - Camera::position.x ;
+	rc.top = position.y + Camera::ScreenHeight *0.5f - Camera::position.y ;
+	rc.right = Camera::ScreenWidth;
+	rc.bottom = Camera::ScreenHeight;
+
+	font->DrawTextA(NULL, str.c_str(), -1, &rc, DT_NOCLIP, D3DCOLOR_XRGB(255, 255, 255));
 }

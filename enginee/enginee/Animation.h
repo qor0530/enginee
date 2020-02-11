@@ -3,11 +3,16 @@
 #include <d3dx9.h>
 #include <ctime>
 #include <string>
+
+class GameObject;
+
 class Animation
 {
 public:
 	
 	std::string textureName;
+
+	GameObject *parent;
 
 	D3DXVECTOR2 imageSize;
 	D3DXVECTOR2 frameSize;

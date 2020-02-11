@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Bullet.h"
-
 #include "Animation.h"
+#include "Camera.h"
 
 Bullet::Bullet():
 	direction({0.0f, 0.0f}),
@@ -29,6 +29,17 @@ void Bullet::Update()
 	{
 		isActive = false;
 	}
+}
+
+void Bullet::OnCollisionEnter(GameObject * gameObject)
+{
+	if (gameObject->name == "Enemy")
+	{
+		gameObject->isActive = false;
+		this->isActive = false;
+		Camera::AddShake(10.5f);
+	}
+
 }
 
 void Bullet::SetOption(D3DXVECTOR2 direction, float speed)

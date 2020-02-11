@@ -2,10 +2,8 @@
 #include "Camera.h"
 #include "Scene.h"
 #include "GraphicManager.h"
-#include "TextObject.h"
-#include "BackGround.h"
 #include "InputManager.h"
-#include "Enemy.h"
+
 
 LPDIRECT3D9 GameManager::g_pD3D = LPDIRECT3D9();
 LPDIRECT3DDEVICE9 GameManager::g_pd3dDevice = LPDIRECT3DDEVICE9();
@@ -28,25 +26,25 @@ void GameManager::Init(HWND hWnd)
 
 	GraphicManager::Init(g_pd3dDevice);
 	InputManager::Init(hWnd);
+
 	nowScene = new Scene();
-	Instantiate<Enemy>({ 500.0f, 0.0f });
-	Instantiate<Enemy>({ -500.0f, 0.0f });
-	Instantiate<Enemy>({ 0.0f, 500.0f });
-	Instantiate<Enemy>({ 0.0f, -500.0f });
-	Instantiate<TextObject>({ 0.0f, 0.0f });
-	Instantiate<BackGround>({ 0.0f, 0.0f });
+
+	nowScene->ChangeScene("Main");
 }
 
 void GameManager::Update()
 {
+	nowScene->CheckNextScene();
 	InputManager::Update();
 	nowScene->Update();
+	nowScene->CollisionCheck();
+	nowScene->LateUpdate();
 	Camera::Update();
 }
 
 void GameManager::Render()
 {
-	g_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 255), 1.0f, 0);
+	g_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 
 	// Begin the scene
 	g_pd3dDevice->BeginScene();

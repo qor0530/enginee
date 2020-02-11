@@ -17,5 +17,9 @@ public:
 	static D3DXVECTOR2 scale;
 	static D3DXMATRIX matrix;
 	static float degree;
+
+	static void AddShake(float shake);
+
+	static float shake;
 };
 

@@ -4,8 +4,9 @@
 #include <list>
 #include <string> 
 #include <typeinfo.h>
-
+#include <mmsystem.h>
 #include <d3dx9.h>
+class BoxCollider;
 class Component;
 class Animation;
 using namespace std;
@@ -16,8 +17,10 @@ public:
 	GameObject();
 	virtual ~GameObject();
 
-	Animation * animation;
+	std::string name;
 
+	Animation * animation;
+	BoxCollider * collider;
 	D3DXVECTOR2 position;
 	D3DXVECTOR2 scale;
 	float degree;
@@ -30,7 +33,10 @@ public:
 	virtual void Update();
 	virtual void LateUpdate();
 	virtual void OnDestroy();
+	virtual void OnRender();
+	virtual void OnCollisionEnter(GameObject * GameObject);
 
+	GameObject *Find(string name);
 	void UpdateAnimation();
 	//template<class T>
 	//T * AddComponent();
